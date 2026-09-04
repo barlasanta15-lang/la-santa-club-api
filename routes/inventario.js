@@ -35,6 +35,32 @@ router.patch("/:id/restar", async (req, res) => {
   }
 });
 
+router.patch("/:id/sumar", async (req, res) => {
+  try {
+    const producto = await Inventario.findById(req.params.id);
+
+    if (!producto) {
+      return res.status(404).json({
+        mensaje: "Producto no encontrado",
+      });
+    }
+
+    producto.stock += 1;
+    await producto.save();
+
+    res.status(200).json({
+      mensaje: "Se agregó una unidad correctamente",
+      producto,
+    });
+  } catch (error) {
+    console.error("Error al sumar stock:", error);
+
+    res.status(500).json({
+      mensaje: "Error al sumar stock",
+    });
+  }
+});
+
 function normalizarNombre(texto) {
   return texto
     .trim()
