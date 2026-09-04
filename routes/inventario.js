@@ -3,6 +3,38 @@ const Inventario = require("../models/Inventario");
 
 const router = express.Router();
 
+router.patch("/:id/restar", async (req, res) => {
+  try {
+    const producto = await Inventario.findById(req.params.id);
+
+    if (!producto) {
+      return res.status(404).json({
+        mensaje: "Producto no encontrado",
+      });
+    }
+
+    if (producto.stock <= 0) {
+      return res.status(400).json({
+        mensaje: "El producto ya está agotado",
+      });
+    }
+
+    producto.stock -= 1;
+    await producto.save();
+
+    res.json({
+      mensaje: "Se restó una unidad correctamente",
+      producto,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      mensaje: "Error al restar stock",
+    });
+  }
+});
+
 function normalizarNombre(texto) {
   return texto
     .trim()
